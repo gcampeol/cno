@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DashboardProvider } from "@/components/dashboard-provider";
 import { KpiRow } from "@/components/kpi-row";
+import { MapaCalor } from "@/components/mapa-calor";
 import { DonutTipologia } from "@/components/donut-tipologia";
 import { TabelasRegiao } from "@/components/tabelas-regiao";
 
@@ -17,9 +18,7 @@ export default function Home() {
         <main className="mx-auto max-w-[1400px] space-y-6 px-4 py-6 sm:px-6">
           <KpiRow />
           <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-            <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-border bg-card text-sm text-muted-foreground">
-              Mapa de calor (Fase 6)
-            </div>
+            <MapaCalor />
             <div className="space-y-6">
               <DonutTipologia />
               <TabelasRegiao />
