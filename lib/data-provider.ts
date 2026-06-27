@@ -4,8 +4,8 @@
 // é uma escolha da fase de mock/amostra: funciona porque o conjunto é pequeno.
 //
 // Seleção automática: se houver credenciais Supabase (NEXT_PUBLIC_SUPABASE_URL
-// + _ANON_KEY), usa o banco; senão, cai no mock. Assim o app roda sem config e
-// passa a usar o Supabase quando as envs existirem.
+// + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY), usa o banco; senão, cai no mock.
+// Assim o app roda sem config e passa a usar o Supabase quando as envs existirem.
 //
 // Para a base real do CNO (milhões de registros) NÃO dá para baixar tudo e
 // agregar no navegador. A migração (ver DATA.md) move as agregações para o
@@ -14,7 +14,7 @@
 
 import { mockObras } from "./mock-data";
 import { fetchAllObras } from "./supabase/obras";
-import { hasSupabaseEnv } from "./supabase/client";
+import { hasSupabaseEnv } from "@/utils/supabase/client";
 import type { Obra } from "./types";
 
 export type FonteDados = "mock" | "supabase";

@@ -11,8 +11,13 @@ está descrita em [DATA.md](DATA.md).
    e guarde a senha do banco).
 2. Em **Project Settings → API**, copie:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role** (secreta) → `SUPABASE_SERVICE_ROLE_KEY`
+   - **publishable key** (`sb_publishable_...`) → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - **secret key** (`sb_secret_...`) ou **service_role** → `SUPABASE_SERVICE_ROLE_KEY`
+
+> O cliente de leitura usa `@supabase/ssr` (`utils/supabase/client.ts`) com a
+> publishable key. O `server.ts`/`middleware.ts` do quickstart só são
+> necessários se você adicionar **autenticação** — este dashboard é leitura
+> pública, então não foram incluídos.
 
 ## 2. Criar o schema
 
@@ -46,8 +51,8 @@ novo). Deve imprimir "Inseridas 8000/8000" e "Seed concluído".
 
 - **Local:** com as envs no `.env.local`, `npm run dev` já lê do banco.
 - **Vercel:** em **Project Settings → Environment Variables**, adicione
-  `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (a `service_role`
-  NÃO precisa ir para a Vercel — ela só serve ao seed local). Redeploy.
+  `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (a chave
+  secreta NÃO vai para a Vercel — ela só serve ao seed local). Redeploy.
 
 Para confirmar a fonte ativa, o provider expõe `getDataProvider().fonte`
 (`"mock"` ou `"supabase"`).

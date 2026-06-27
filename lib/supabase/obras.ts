@@ -4,7 +4,7 @@ import type {
   Situacao,
   Tipologia,
 } from "@/lib/types";
-import { createSupabaseBrowserClient } from "./client";
+import { createClient } from "@/utils/supabase/client";
 
 /** Linha da tabela `obras` (snake_case do Postgres). */
 interface ObraRow {
@@ -45,7 +45,7 @@ function rowToObra(r: ObraRow): Obra {
  * server-side (ver DATA.md).
  */
 export async function fetchAllObras(): Promise<Obra[]> {
-  const supabase = createSupabaseBrowserClient();
+  const supabase = createClient();
   const pageSize = 1000;
   let from = 0;
   const todas: Obra[] = [];
