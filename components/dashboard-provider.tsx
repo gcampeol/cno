@@ -5,32 +5,44 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
+import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 
 import { mockObras } from "@/lib/mock-data";
-import { EMPTY_FILTROS, filterObras, type Filtros } from "@/lib/filters";
+import { filterObras, type Filtros } from "@/lib/filters";
 import type { Obra } from "@/lib/types";
 
 interface DashboardContextValue {
-  /** Dataset completo (não filtrado). */
   todasObras: Obra[];
-  /** Dataset após aplicar os filtros ativos. */
   obras: Obra[];
   filtros: Filtros;
-  setFiltros: (f: Filtros) => void;
-  /** Liga/desliga um valor numa dimensão (usado por facetas e cross-filter). */
   toggleFiltro: (dimensao: keyof Filtros, valor: string) => void;
-  /** Define exatamente os valores de uma dimensão. */
   setDimensao: (dimensao: keyof Filtros, valores: string[]) => void;
   limparFiltros: () => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
 
+const arr = () => parseAsArrayOf(parseAsString).withDefault([]);
+
+// Cada dimensão de filtro vira um parâmetro de array na URL.
+const filtroParsers = {
+  tipologia: arr(),
+  situacao: arr(),
+  metragem: arr(),
+  responsavelTipo: arr(),
+  uf: arr(),
+  municipio: arr(),
+  bairro: arr(),
+  ano: arr(),
+};
+
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  const [filtros, setFiltros] = useState<Filtros>(EMPTY_FILTROS);
+  const [filtros, setFiltros] = useQueryStates(filtroParsers, {
+    history: "replace",
+    clearOnDefault: true,
+  });
 
   const todasObras = mockObras;
   const obras = useMemo(
@@ -40,32 +52,40 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   const toggleFiltro = useCallback(
     (dimensao: keyof Filtros, valor: string) => {
-      setFiltros((prev) => {
-        const atual = prev[dimensao];
-        const proximo = atual.includes(valor)
-          ? atual.filter((v) => v !== valor)
-          : [...atual, valor];
-        return { ...prev, [dimensao]: proximo };
-      });
+      const atual = filtros[dimensao];
+      const proximo = atual.includes(valor)
+        ? atual.filter((v) => v !== valor)
+        : [...atual, valor];
+      void setFiltros({ [dimensao]: proximo } as Partial<Filtros>);
     },
-    [],
+    [filtros, setFiltros],
   );
 
   const setDimensao = useCallback(
     (dimensao: keyof Filtros, valores: string[]) => {
-      setFiltros((prev) => ({ ...prev, [dimensao]: valores }));
+      void setFiltros({ [dimensao]: valores } as Partial<Filtros>);
     },
-    [],
+    [setFiltros],
   );
 
-  const limparFiltros = useCallback(() => setFiltros(EMPTY_FILTROS), []);
+  const limparFiltros = useCallback(() => {
+    void setFiltros({
+      tipologia: [],
+      situacao: [],
+      metragem: [],
+      responsavelTipo: [],
+      uf: [],
+      municipio: [],
+      bairro: [],
+      ano: [],
+    });
+  }, [setFiltros]);
 
   const value = useMemo<DashboardContextValue>(
     () => ({
       todasObras,
       obras,
       filtros,
-      setFiltros,
       toggleFiltro,
       setDimensao,
       limparFiltros,
