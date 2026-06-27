@@ -1,5 +1,6 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DashboardProvider } from "@/components/dashboard-provider";
+import { BuscaCno } from "@/components/busca-cno";
 import { CommandPalette } from "@/components/command-palette";
 import { FiltrosBar } from "@/components/filtros/filtros-bar";
 import { KpiRow } from "@/components/kpi-row";
@@ -20,6 +21,7 @@ export default function Home() {
             Radar de Obras · CNO
           </span>
           <div className="flex items-center gap-2">
+            <BuscaCno />
             <CommandPalette />
             <ThemeToggle />
           </div>

@@ -38,6 +38,7 @@ const filtroParsers = {
   municipio: arr(),
   bairro: arr(),
   ano: arr(),
+  cno: arr(),
 };
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
@@ -96,6 +97,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       municipio: [],
       bairro: [],
       ano: [],
+      cno: [],
     });
   }, [setFiltros]);
 

@@ -18,6 +18,8 @@ export interface Filtros {
   municipio: string[];
   bairro: string[];
   ano: string[];
+  /** Busca por CNO específico (cross-filter para uma única obra). */
+  cno: string[];
 }
 
 export const EMPTY_FILTROS: Filtros = {
@@ -29,6 +31,7 @@ export const EMPTY_FILTROS: Filtros = {
   municipio: [],
   bairro: [],
   ano: [],
+  cno: [],
 };
 
 export interface MetragemBucket {
@@ -68,6 +71,7 @@ export function temFiltroAtivo(filtros: Filtros): boolean {
 
 export function filterObras(obras: Obra[], filtros: Filtros): Obra[] {
   return obras.filter((o) => {
+    if (filtros.cno.length && !filtros.cno.includes(o.cno)) return false;
     if (filtros.tipologia.length && !filtros.tipologia.includes(o.tipologia))
       return false;
     if (filtros.situacao.length && !filtros.situacao.includes(o.situacao))
