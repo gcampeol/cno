@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { KpiRow } from "@/components/kpi-row";
 
 export default function Home() {
   return (
@@ -9,13 +10,10 @@ export default function Home() {
         </span>
         <ThemeToggle />
       </header>
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Dashboard em construção
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Shell e tema prontos. Próximas fases: dados mock, filtros, KPIs, mapa,
-          donut e tabelas.
+      <main className="mx-auto max-w-7xl space-y-8 px-6 py-8">
+        <KpiRow />
+        <p className="text-sm text-muted-foreground">
+          Próximas fases: mapa de calor, donut por tipologia, tabelas e filtros.
         </p>
       </main>
     </div>
