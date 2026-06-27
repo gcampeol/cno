@@ -9,12 +9,19 @@
 // nome_empresarial).
 
 import { BigQuery } from "@google-cloud/bigquery";
+import WebSocket from "ws";
 import { createClient } from "@supabase/supabase-js";
 
 import {
   SERRA_GAUCHA_CODIGOS,
   SERRA_POR_CODIGO,
 } from "./serra-gaucha-municipios";
+
+// Node 20 não tem WebSocket global; supabase-js exige. (Node 22 teria, mas
+// quebra a auth do BigQuery/gaxios — então ficamos no 20 + polyfill.)
+if (typeof (globalThis as any).WebSocket === "undefined") {
+  (globalThis as any).WebSocket = WebSocket;
+}
 
 const projectId = process.env.GCP_PROJECT_ID;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
