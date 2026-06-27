@@ -1,8 +1,8 @@
 // Introspecção do CNO no BigQuery (Base dos Dados).
 //
-// Descobre o(s) dataset(s) com "cno", lista tabelas + colunas e mostra uma
-// amostra. Roda no GitHub Action (mode=introspect). A partir da saída, fechamos
-// o mapeamento exato para o schema `obras` do Supabase e escrevemos o load.
+// Consulta o dataset público direto pelo nome (não dá pra listar SCHEMATA do
+// projeto basedosdados sendo externo). Lista tabelas + colunas e mostra uma
+// amostra. A partir da saída, fechamos o mapeamento para o schema `obras`.
 
 import { BigQuery } from "@google-cloud/bigquery";
 
@@ -14,39 +14,45 @@ async function q(sql: string): Promise<any[]> {
   return rows as any[];
 }
 
+const CANDIDATOS = process.env.CNO_DATASET
+  ? [process.env.CNO_DATASET]
+  : ["br_me_cno"];
+
 async function main() {
   console.log("Projeto de billing:", projectId);
 
-  const schemata = await q(
-    "SELECT schema_name FROM `basedosdados`.`region-us`.INFORMATION_SCHEMA.SCHEMATA WHERE LOWER(schema_name) LIKE '%cno%'",
-  );
-  console.log("Datasets com 'cno':", JSON.stringify(schemata));
-
-  for (const s of schemata) {
-    const ds = s.schema_name as string;
-    const cols = await q(
-      `SELECT table_name, column_name, data_type
-       FROM \`basedosdados\`.${ds}.INFORMATION_SCHEMA.COLUMNS
-       ORDER BY table_name, ordinal_position`,
-    );
-    console.log(`\n===== dataset basedosdados.${ds} — colunas =====`);
-    for (const c of cols) {
-      console.log(`${c.table_name}\t${c.column_name}\t${c.data_type}`);
-    }
-
-    const tabelas = Array.from(new Set(cols.map((c) => c.table_name)));
-    for (const t of tabelas) {
-      try {
-        const amostra = await q(
-          `SELECT * FROM \`basedosdados\`.${ds}.${t} LIMIT 3`,
-        );
-        console.log(`\n----- amostra basedosdados.${ds}.${t} -----`);
-        console.log(JSON.stringify(amostra, null, 2));
-      } catch (e: any) {
-        console.log(`amostra ${ds}.${t} falhou: ${e.message}`);
+  for (const ds of CANDIDATOS) {
+    try {
+      const cols = await q(
+        `SELECT table_name, column_name, data_type
+         FROM \`basedosdados.${ds}\`.INFORMATION_SCHEMA.COLUMNS
+         ORDER BY table_name, ordinal_position`,
+      );
+      console.log(`\n===== basedosdados.${ds} — colunas =====`);
+      for (const c of cols) {
+        console.log(`${c.table_name}\t${c.column_name}\t${c.data_type}`);
       }
+
+      const tabelas = Array.from(new Set(cols.map((c) => c.table_name)));
+      for (const t of tabelas) {
+        try {
+          const amostra = await q(
+            `SELECT * FROM \`basedosdados.${ds}.${t}\` LIMIT 3`,
+          );
+          console.log(`\n----- amostra basedosdados.${ds}.${t} -----`);
+          console.log(JSON.stringify(amostra, null, 2));
+        } catch (e: any) {
+          console.log(`amostra ${ds}.${t} falhou: ${e.message}`);
+        }
+      }
+      return;
+    } catch (e: any) {
+      console.log(`dataset basedosdados.${ds} falhou: ${e.message}`);
     }
   }
+  console.log(
+    "Nenhum candidato funcionou. Rode de novo definindo o secret/var CNO_DATASET com o nome certo.",
+  );
 }
 
 main().catch((e) => {
