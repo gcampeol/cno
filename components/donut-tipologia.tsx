@@ -5,6 +5,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 import { countByTipologia } from "@/lib/aggregations";
 import { useDashboard } from "@/components/dashboard-provider";
+import { EmptyState } from "@/components/empty-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,11 @@ export function DonutTipologia() {
           Obras por tipologia
         </CardTitle>
       </CardHeader>
+      {total === 0 ? (
+        <CardContent>
+          <EmptyState />
+        </CardContent>
+      ) : (
       <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative mx-auto h-[180px] w-[180px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -113,6 +119,7 @@ export function DonutTipologia() {
           })}
         </ul>
       </CardContent>
+      )}
     </Card>
   );
 }

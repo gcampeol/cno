@@ -6,6 +6,8 @@ import type { HeatmapLayerSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useDashboard } from "@/components/dashboard-provider";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 // Basemap dark da Carto (grátis, sem token).
@@ -42,7 +44,7 @@ function heatmapPaint(metrica: Metrica): HeatmapLayerSpecification["paint"] {
 }
 
 export function MapaCalor() {
-  const { obras } = useDashboard();
+  const { obras, limparFiltros } = useDashboard();
   const [mounted, setMounted] = useState(false);
   const [metrica, setMetrica] = useState<Metrica>("obras");
 
@@ -95,8 +97,22 @@ export function MapaCalor() {
           <NavigationControl position="bottom-right" showCompass={false} />
         </Map>
       ) : (
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          Carregando mapa…
+        <Skeleton className="h-full w-full rounded-none" />
+      )}
+
+      {mounted && obras.length === 0 && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/70 text-center backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground">
+            Nenhuma obra com esses filtros.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={limparFiltros}
+            className="h-8 text-xs"
+          >
+            Limpar filtros
+          </Button>
         </div>
       )}
     </div>

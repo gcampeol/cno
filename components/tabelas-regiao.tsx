@@ -17,6 +17,7 @@ import {
   countByUf,
 } from "@/lib/aggregations";
 import { useDashboard } from "@/components/dashboard-provider";
+import { EmptyState } from "@/components/empty-state";
 import type { Filtros } from "@/lib/filters";
 import type { RegiaoCount } from "@/lib/types";
 import {
@@ -149,7 +150,16 @@ function RegiaoTable({
                 key={row.id}
                 data-state={ativo ? "selected" : undefined}
                 onClick={() => toggleFiltro(dim, row.original.nome)}
-                className="cursor-pointer"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleFiltro(dim, row.original.nome);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-pressed={ativo}
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
@@ -184,6 +194,9 @@ export function TabelasRegiao() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {obras.length === 0 ? (
+          <EmptyState />
+        ) : (
         <Tabs defaultValue="uf">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="uf">UF</TabsTrigger>
@@ -200,6 +213,7 @@ export function TabelasRegiao() {
             <RegiaoTable data={porBairro} dim="bairro" labelCol="Bairro" />
           </TabsContent>
         </Tabs>
+        )}
       </CardContent>
     </Card>
   );

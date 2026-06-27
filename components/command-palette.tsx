@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { useDashboard } from "@/components/dashboard-provider";
 import type { Opcao } from "@/components/filtros/faceted-filter";
@@ -80,9 +81,15 @@ export function CommandPalette() {
     ];
   }, [todasObras]);
 
-  const aplicar = (dim: keyof Filtros, valor: string) => {
+  const aplicar = (
+    dim: keyof Filtros,
+    titulo: string,
+    valor: string,
+    label: string,
+  ) => {
     toggleFiltro(dim, valor);
     setOpen(false);
+    toast.success(`Filtro aplicado: ${titulo}`, { description: label });
   };
 
   return (
@@ -108,7 +115,7 @@ export function CommandPalette() {
                 <CommandItem
                   key={`${g.dim}-${op.value}`}
                   value={`${g.titulo} ${op.label}`}
-                  onSelect={() => aplicar(g.dim, op.value)}
+                  onSelect={() => aplicar(g.dim, g.titulo, op.value, op.label)}
                 >
                   {op.label}
                 </CommandItem>

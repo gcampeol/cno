@@ -9,7 +9,7 @@ import {
 } from "react";
 import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 
-import { mockObras } from "@/lib/mock-data";
+import { dataProvider } from "@/lib/data-provider";
 import { filterObras, type Filtros } from "@/lib/filters";
 import type { Obra } from "@/lib/types";
 
@@ -44,7 +44,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     clearOnDefault: true,
   });
 
-  const todasObras = mockObras;
+  const todasObras = dataProvider.getAllObras();
   const obras = useMemo(
     () => filterObras(todasObras, filtros),
     [todasObras, filtros],
