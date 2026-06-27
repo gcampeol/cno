@@ -84,9 +84,7 @@ export function ObraDetalhe({
                 </span>
               </Campo>
               <Campo label="Responsável">
-                {obra.responsavelTipo === "PJ"
-                  ? obra.responsavelNome
-                  : "Pessoa física"}
+                {obra.responsavelNome ?? "Não informado"}
                 <span className="ml-1 text-xs text-muted-foreground">
                   ({obra.responsavelTipo})
                 </span>

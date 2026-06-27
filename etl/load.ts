@@ -79,6 +79,7 @@ async function main() {
       ANY_VALUE(bairro)          AS bairro,
       ANY_VALUE(situacao)        AS situacao,
       ANY_VALUE(nome_empresarial) AS nome_empresarial,
+      ANY_VALUE(nome_responsavel) AS nome_responsavel,
       MIN(data_registro)         AS data_registro,
       SUM(area)                  AS area
     FROM \`basedosdados.br_me_cno.microdados\`
@@ -111,7 +112,13 @@ async function main() {
       lng: (muni?.lng ?? -51.18) + dlng,
       situacao: situacaoEnum(sit.get(String(r.situacao))),
       responsavel_tipo: pj ? "PJ" : "PF",
-      responsavel_nome: pj ? String(r.nome_empresarial) : null,
+      // FASE DE TESTE: traz o nome do responsável (PF inclusive) para validar
+      // os dados. Antes de lançar, voltar PF para null (LGPD) — ver SUPABASE.md.
+      responsavel_nome: pj
+        ? String(r.nome_empresarial)
+        : r.nome_responsavel
+          ? String(r.nome_responsavel)
+          : null,
       data_registro: dataValor(r.data_registro) ?? "2018-01-01",
     };
   });
