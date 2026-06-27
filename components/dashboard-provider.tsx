@@ -4,14 +4,17 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from "react";
 import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 
-import { dataProvider } from "@/lib/data-provider";
+import { getDataProvider } from "@/lib/data-provider";
 import { filterObras, type Filtros } from "@/lib/filters";
 import type { Obra } from "@/lib/types";
+import { DashboardSkeleton } from "@/components/dashboard-skeleton";
 
 interface DashboardContextValue {
   todasObras: Obra[];
@@ -26,7 +29,6 @@ const DashboardContext = createContext<DashboardContextValue | null>(null);
 
 const arr = () => parseAsArrayOf(parseAsString).withDefault([]);
 
-// Cada dimensão de filtro vira um parâmetro de array na URL.
 const filtroParsers = {
   tipologia: arr(),
   situacao: arr(),
@@ -44,11 +46,27 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     clearOnDefault: true,
   });
 
-  const todasObras = dataProvider.getAllObras();
-  const obras = useMemo(
-    () => filterObras(todasObras, filtros),
-    [todasObras, filtros],
-  );
+  // Fonte de dados (mock ou Supabase) carregada de forma assíncrona.
+  const [todasObras, setTodasObras] = useState<Obra[] | null>(null);
+
+  useEffect(() => {
+    let cancelado = false;
+    getDataProvider()
+      .getAllObras()
+      .then((dados) => {
+        if (!cancelado) setTodasObras(dados);
+      })
+      .catch((err) => {
+        console.error("Falha ao carregar obras:", err);
+        if (!cancelado) setTodasObras([]);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  const base = todasObras ?? [];
+  const obras = useMemo(() => filterObras(base, filtros), [base, filtros]);
 
   const toggleFiltro = useCallback(
     (dimensao: keyof Filtros, valor: string) => {
@@ -83,15 +101,19 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<DashboardContextValue>(
     () => ({
-      todasObras,
+      todasObras: base,
       obras,
       filtros,
       toggleFiltro,
       setDimensao,
       limparFiltros,
     }),
-    [todasObras, obras, filtros, toggleFiltro, setDimensao, limparFiltros],
+    [base, obras, filtros, toggleFiltro, setDimensao, limparFiltros],
   );
+
+  if (todasObras === null) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <DashboardContext.Provider value={value}>
