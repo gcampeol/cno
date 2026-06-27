@@ -7,6 +7,10 @@ import { MapaCalor } from "@/components/mapa-calor";
 import { DonutTipologia } from "@/components/donut-tipologia";
 import { TabelasRegiao } from "@/components/tabelas-regiao";
 
+// Dashboard dirigido por estado na URL (nuqs/useSearchParams): renderiza sob
+// demanda em vez de prerender estático.
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <DashboardProvider>
