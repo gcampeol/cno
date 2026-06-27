@@ -3,11 +3,12 @@
 import { useMemo } from "react";
 
 import { computeKpis } from "@/lib/aggregations";
-import { mockObras } from "@/lib/mock-data";
+import { useDashboard } from "@/components/dashboard-provider";
 import { KpiCard } from "@/components/kpi-card";
 
 export function KpiRow() {
-  const kpis = useMemo(() => computeKpis(mockObras), []);
+  const { obras } = useDashboard();
+  const kpis = useMemo(() => computeKpis(obras), [obras]);
 
   const cards = [
     { label: "Obras", value: kpis.obras },

@@ -1,21 +1,32 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DashboardProvider } from "@/components/dashboard-provider";
 import { KpiRow } from "@/components/kpi-row";
+import { DonutTipologia } from "@/components/donut-tipologia";
+import { TabelasRegiao } from "@/components/tabelas-regiao";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur">
-        <span className="text-sm font-semibold tracking-tight">
-          Radar de Obras · CNO
-        </span>
-        <ThemeToggle />
-      </header>
-      <main className="mx-auto max-w-7xl space-y-8 px-6 py-8">
-        <KpiRow />
-        <p className="text-sm text-muted-foreground">
-          Próximas fases: mapa de calor, donut por tipologia, tabelas e filtros.
-        </p>
-      </main>
-    </div>
+    <DashboardProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur">
+          <span className="text-sm font-semibold tracking-tight">
+            Radar de Obras · CNO
+          </span>
+          <ThemeToggle />
+        </header>
+        <main className="mx-auto max-w-[1400px] space-y-6 px-4 py-6 sm:px-6">
+          <KpiRow />
+          <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+            <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-border bg-card text-sm text-muted-foreground">
+              Mapa de calor (Fase 6)
+            </div>
+            <div className="space-y-6">
+              <DonutTipologia />
+              <TabelasRegiao />
+            </div>
+          </div>
+        </main>
+      </div>
+    </DashboardProvider>
   );
 }
