@@ -1,0 +1,28 @@
+name: Probe Receita CNO
+
+# Testa se o runner do GitHub alcança o servidor de dados abertos da Receita
+# (download do dump vigente do CNO). Não usa secrets.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: HEAD nos candidatos
+        run: |
+          for u in \
+            "https://dadosabertos.rfb.gov.br/CNO/" \
+            "https://dadosabertos.rfb.gov.br/CNO/cno.zip" \
+            "https://arquivos.receitafederal.gov.br/dados/cno/" \
+            "https://arquivos.receitafederal.gov.br/cno/" \
+            "https://arquivos.receitafederal.gov.br/dados/cno/cno.zip" ; do
+            echo "---- $u"
+            curl -s -I --max-time 40 -A "Mozilla/5.0" "$u" -o /dev/null \
+              -w "HTTP %{http_code} | size=%{size_download} | type=%{content_type} | time=%{time_total}s\n" \
+              || echo "FALHOU (timeout/refused)"
+          done
+          echo "==== tenta listar o diretorio (primeiros 60 hrefs) ===="
+          curl -s --max-time 40 -A "Mozilla/5.0" "https://dadosabertos.rfb.gov.br/CNO/" \
+            | grep -oiE 'href="[^"]+"' | head -60 || echo "sem listagem"
